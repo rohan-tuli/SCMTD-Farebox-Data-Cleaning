@@ -1,7 +1,7 @@
 sleepTime := 20
 
-OutboundTrips := ["40101", "40102", "40103", "170303"]
-InboundTrips := ["40111", "40113", "40115"]
+OutboundTrips := ["40101", "40102", "40103", "170303", "713101", "713103", "713105", "713107", "713109", "713111"]
+InboundTrips := ["40111", "40113", "40115", "713102", "713104", "713106", "713108", "713110"]
 
 HasVal(haystack, needle) {
     for index, value in haystack
@@ -25,58 +25,40 @@ KeepLoopRunning := true
 Loop {
 	; two tabs
 	Send, {tab}
-	Sleep sleepTime
-	Send, {tab}
-	Sleep sleepTime
 
+	Send, {tab}
+
+
+
+	Sleep sleepTime
+	Sleep sleepTime
+	Sleep sleepTime
+	Sleep sleepTime
 	Send, ^c ; control C
+	Sleep sleepTime
 	Sleep sleepTime
 
 	;move over another two tabs
 	Send, {tab}
-	Sleep sleepTime
 	Send, {tab}
 	Sleep sleepTime
 
 	;change the direction to OB if what's in the clipboard is in the OB array
 	if (HasVal(OutboundTrips, clipboard) > 0) {
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Sleep sleepTime
-		Send {Up}
-		Sleep sleepTime
-		Send {Down}
+		Send o
 		Sleep sleepTime
 	}
 
 	if (HasVal(InboundTrips, clipboard) > 0) {
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Send {Up}
-		Sleep sleepTime
-		Send {Up}
+		Send i
 		Sleep sleepTime
 	}
-	Sleep sleepTime
+
+	clipboard := ; clear the clipboard
 
 	;another two tabs to wrap back around to the next line
 	Send, {tab}
-	Sleep sleepTime
 	Send, {tab}
-	Sleep sleepTime
 
 	if not KeepLoopRunning ; user signaled the loop to stop by pressing Win-Z again
 		break ; break out of the loop
