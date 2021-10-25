@@ -1,6 +1,6 @@
 sleepTime := 20
 
-OutboundTrips := ["40101", "40102", "40103"]
+OutboundTrips := ["40101", "40102", "40103", "170303"]
 InboundTrips := ["40111", "40113", "40115"]
 
 HasVal(haystack, needle) {
@@ -40,9 +40,37 @@ Loop {
 
 	;change the direction to OB if what's in the clipboard is in the OB array
 	if (HasVal(OutboundTrips, clipboard) > 0) {
-		ToolTip, OB
-		Sleep 2000
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Sleep sleepTime
+		Send {Up}
+		Sleep sleepTime
+		Send {Down}
+		Sleep sleepTime
 	}
+
+	if (HasVal(InboundTrips, clipboard) > 0) {
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Send {Up}
+		Sleep sleepTime
+		Send {Up}
+		Sleep sleepTime
+	}
+	Sleep sleepTime
 
 	;another two tabs to wrap back around to the next line
 	Send, {tab}
