@@ -39,14 +39,17 @@ Loop {
 	;yes, I'm aware that this code is disgusting, but it works. And anyway, AutoHotKey is disgusting
 	if (clipboard = "1625") {
 		Sleep doubleSleepTime
+		Sleep sleepTime
 		Send 40109
 		Sleep doubleSleepTime
 	} else if (clipboard = "1715") {
 		Sleep doubleSleepTime
+		Sleep sleepTime
 		Send 40110
 		Sleep doubleSleepTime
 	} else if (clipboard = "1810") {
 		Sleep doubleSleepTime
+		Sleep sleepTime
 		Send 40111
 		Sleep doubleSleepTime
 	} else if (clipboard = "1900") {
@@ -71,6 +74,7 @@ Loop {
 		Sleep doubleSleepTime
 	} else if (clipboard = "2240") {
 		Sleep doubleSleepTime
+		Sleep sleepTime
 		Send 40117
 		Sleep doubleSleepTime
 	} else if (clipboard = "2345") {

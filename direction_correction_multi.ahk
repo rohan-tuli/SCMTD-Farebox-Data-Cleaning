@@ -46,9 +46,11 @@ pixelColor :=
 ;define line counter (start at line 1)
 lineCounter := 1
 
+eventLineCounter := 0
+
 Loop {
 	;run loop from the single instance program until the end condition is met
-	while(pixelColor != 0x3399FF) { ;end condition = the pixels from the date range dropdown turn blue
+	while(eventLineCounter < 50) { ;end condition = the pixels from the date range dropdown turn blue
 		; two tabs
 		Send, {tab}
 		Sleep sleepTime
@@ -66,6 +68,9 @@ Loop {
 		Sleep sleepTime
 		Send, {tab}
 		Sleep sleepTime
+
+		;PixelGetColor, pixelColor, 680, 125 ;GFI window must be on main 1680x1050 monitor, snapped to the left
+		;Sleep, sleepTime
 
 		;change the direction to OB if what's in the clipboard is in the OB array
 		if ((HasVal(OutboundTrips1, clipboard) > 0) || (HasVal(OutboundTrips2, clipboard) > 0) || (HasVal(OutboundTrips3, clipboard) > 0)) {
@@ -91,10 +96,13 @@ Loop {
 		Sleep sleepTime
 		Send, {tab}
 		Sleep doubleSleepTime
+		Sleep doubleSleepTime
 
 
-		PixelGetColor, pixelColor, 681, 125 ;GFI window must be on main 1680x1050 monitor, snapped to the left
-		Sleep, sleepTime
+		;PixelGetColor, pixelColor, 680, 125 ;GFI window must be on main 1680x1050 monitor, snapped to the left
+		;Sleep, sleepTime
+
+		eventLineCounter++
 
 		if not KeepLoopRunning ; user signaled the loop to stop by pressing F12 again
 			break ; break out of the loop
@@ -102,6 +110,8 @@ Loop {
 		
 	;press F2
 	Send {F2}
+	Sleep, sleepTime
+	Send {Enter}
 	Sleep, sleepTime
 
 	;go down the number of lines specified by the line counter
