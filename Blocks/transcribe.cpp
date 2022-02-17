@@ -132,7 +132,7 @@ Trip createTrip(std::string GTFSstring) {
 	newTrip->startTime = timeToInt(startTime);
 	newTrip->endTime = timeToInt(endTime);
 
-	if (direction.compare("1") == true) {
+	if (direction.compare("1") == 0) {
 		newTrip->direction = 1;
 	} else {
 		newTrip->direction = 0;
@@ -153,9 +153,27 @@ void printBlock(vector<Trip> tripList) {
 	}
 }
 
+
+//given a farebox export string, search the vector and return trip of the corresponding time
+Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
+	std::string timeString = "";
+	//get the time string by going through the farebox string until there's a space
+
+	//if it's within the times of a trip, assign it to that trip
+	//if it after a trip, assign it to the nxet trip
+	//
+
+	cout << fareboxString << endl;
+}
+
+//given a file to output to, create the autohotkey entry for a trip
+void createAHKfromTrip(std::string fileName, Trip tripObj) {
+
+}
+
 int main() {
 	//load the correct block from GTFS trips.txt and put in a vector 
-	std::string block = "3508"; //hard coded for now
+	std::string block = "4201"; //hard coded for now
 
 	//open the file and read each line
 	//add its information to the vector, checking if it's the correct block
@@ -187,7 +205,8 @@ int main() {
 	if (fareboxFile.is_open()) {
 		//go through by line
 		while (getline(fareboxFile, line)) {
-	
+			//for each line, compare the times and generate the correct AHK
+			findTrip(tripList, line);
 		}
 		//close the file after the last line
 		fareboxFile.close();
