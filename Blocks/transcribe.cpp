@@ -17,6 +17,7 @@ using namespace std;
 #define DIRECTION_ID_COMMAS 16
 #define TRIP_TIME_START_COMMAS 17
 
+#define HOUR_INT 60
 
 //trip datastructure
 typedef struct TripObj *Trip;
@@ -28,6 +29,8 @@ typedef struct TripObj {
 	char* trip;
 	int direction;
 } TripObj;
+
+//to DO: define a special "9" node to be used when to trip fits
 
 
 //check if the correct string is from the desired block
@@ -73,7 +76,7 @@ int timeToInt(std::string timeString) {
 
 //function to create a new trip from a line of the GTFS trips.txt
 Trip createTrip(std::string GTFSstring) {
-	cout << GTFSstring << endl;
+	//cout << GTFSstring << endl;
 	//allocate memory
 	Trip newTrip = (Trip)malloc(sizeof(TripObj));
 
@@ -110,6 +113,7 @@ Trip createTrip(std::string GTFSstring) {
 		stringIndex++;
 	}
 
+	/*
 	cout << routeID << endl;
 	cout << run << endl;
 	cout << trip << endl;
@@ -117,7 +121,7 @@ Trip createTrip(std::string GTFSstring) {
 	cout << startTime << endl;
 	cout << endTime << endl;
 	cout << timeToInt(startTime) << endl;
-	cout << timeToInt(endTime) << endl;
+	cout << timeToInt(endTime) << endl; */
 
 	//allocate memory for all the char*'s and convert the direction to an int
 	newTrip->routeID = (char*)calloc(routeID.length() + 1, sizeof(char));
@@ -153,17 +157,86 @@ void printBlock(vector<Trip> tripList) {
 	}
 }
 
+void printTrip(Trip printMe) {
+	cout << printMe->startTime << ", "
+		 << printMe->endTime << ", "
+		 << printMe->routeID << ", "
+		 << printMe->run << ", "
+		 << printMe->trip << ", "
+		 << printMe->direction << endl;
+}
+
 
 //given a farebox export string, search the vector and return trip of the corresponding time
 Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
+	//Trip containing all 9s
+	Trip blankTrip = createTrip("9,9,9,9,9,0,9,9,9,9,00:00:00,9,\"Santa Cruz Metro Center\",0,9,,0,00:00:00");
+
 	std::string timeString = "";
 	//get the time string by going through the farebox string until there's a space
+	int i;
+	for (i = 0; fareboxString[i] != ' '; i++) {
+		//cout << fareboxString[i];
+ 	}
+ 	i += 2; //increment i until its after the space
+ 	cout << endl;
 
-	//if it's within the times of a trip, assign it to that trip
-	//if it after a trip, assign it to the nxet trip
-	//
+ 	//add to the timestring until the comma
+ 	for(i; fareboxString[i] != ','; i++) {
+ 		timeString.push_back(fareboxString[i]);
+ 	}
+
+ 	//cout << "Timestring: " << timeString << endl;
+
+ 	//convert the timestring to an int
+ 	int timeInt = timeToInt(timeString);
+
+
+
+ 	//// TO DO ////
+ 	/*
+	Change the way it sarches trips to do the following order:
+	1) Check if the time is before any of the trips in the block
+	2) Check if the time is after any of the trips in the block
+	3) Go through the block and check if the time is either within a trip or between trips
+
+ 	*/
+
+ 	//iterate through the trip vector to find the correct trip
+ 	Trip bestMatch;
+	for (int j = 0; j < tripList.size(); j++) {
+		//if it's within the times of a trip, assign it to that trip
+		//if it after a trip but before the next, assign it to the nxet trip
+		//if it's after the last trip (within an hour), assign it to the last trip
+		//if it's before the first trip (withins an hour), assign it to the first trip
+		//else, assign it to 9
+		if (timeInt >= tripList[j]->startTime && timeInt <= tripList[j]->endTime) {
+			bestMatch = tripList[j]; 
+		} else if (j != (tripList.size() - 1) && timeInt > tripList[j]->endTime &&
+				   timeInt <= tripList[j + 1]->startTime) {
+			cout << "Between trips ";
+			bestMatch = tripList[j + 1];
+			printTrip(tripList[j+1]);
+
+		} else if (j == (tripList.size() - 1) && timeInt > tripList[j]->endTime &&
+				   timeInt < (tripList[j]->endTime + HOUR_INT)) {
+			bestMatch = tripList[j];
+		} else if (j == 0 && timeInt < tripList[j]->startTime &&
+				   timeInt > (tripList[j]->startTime - HOUR_INT)) {
+			bestMatch = tripList[j];
+		} else {
+			//set it to the 9 node
+			bestMatch = blankTrip;
+		}
+
+	} 	
+
+
 
 	cout << fareboxString << endl;
+	cout << bestMatch->startTime << "," << bestMatch->endTime << "," << bestMatch->routeID << "," << bestMatch->run << "," << bestMatch->trip << "," << bestMatch->direction << endl;
+
+	return bestMatch;
 }
 
 //given a file to output to, create the autohotkey entry for a trip
@@ -173,12 +246,12 @@ void createAHKfromTrip(std::string fileName, Trip tripObj) {
 
 int main() {
 	//load the correct block from GTFS trips.txt and put in a vector 
-	std::string block = "4201"; //hard coded for now
+	std::string block = "1553"; //hard coded for now
 
 	//open the file and read each line
 	//add its information to the vector, checking if it's the correct block
 	vector<Trip> tripList; //vector of trips
-	ifstream GTFSfile("trips.txt"); //create file object
+	ifstream GTFSfile("trips.csv"); //create file object
 	string lineFromGTFSfile;
 	if (GTFSfile.is_open()) {
 		//go through by line
@@ -211,4 +284,6 @@ int main() {
 		//close the file after the last line
 		fareboxFile.close();
 	}
+
+	cout << "1 hour = " << timeToInt("01:00:00") << endl;
 }
