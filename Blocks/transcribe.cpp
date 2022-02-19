@@ -18,6 +18,7 @@ using namespace std;
 #define TRIP_TIME_START_COMMAS 17
 
 #define HOUR_INT 60
+#define TEN_MIN_INT 10
 
 //trip datastructure
 typedef struct TripObj *Trip;
@@ -63,13 +64,14 @@ bool isCorrectBlock(std::string block, std::string GTFSstring) {
 //convert time to int
 int timeToInt(std::string timeString) {
 	int timeInt = 0;
-	timeInt += timeString[1] - 48;
-	timeInt += (timeString[0] - 48) * 10;
+		timeInt += timeString[1] - 48;
 
-	timeInt *= 60;
+		timeInt += (timeString[0] - 48) * 10;
 
-	timeInt += timeString[4] - 48;
-	timeInt += (timeString[3] - 48) * 10;
+		timeInt *= 60;
+
+		timeInt += timeString[4] - 48;
+		timeInt += (timeString[3] - 48) * 10;
 
 	return timeInt;
 }
@@ -178,7 +180,7 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
 	for (i = 0; fareboxString[i] != ' '; i++) {
 		//cout << fareboxString[i];
  	}
- 	i += 2; //increment i until its after the space
+ 	i ++; //increment i until its after the space
  	cout << endl;
 
  	//add to the timestring until the comma
@@ -186,7 +188,7 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
  		timeString.push_back(fareboxString[i]);
  	}
 
- 	//cout << "Timestring: " << timeString << endl;
+ 	cout << "FB Time StringX" << timeString << endl;
 
  	//convert the timestring to an int
  	int timeInt = timeToInt(timeString);
@@ -200,41 +202,50 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
 	2) Check if the time is after any of the trips in the block
 	3) Go through the block and check if the time is either within a trip or between trips
 
+
  	*/
 
- 	//iterate through the trip vector to find the correct trip
- 	Trip bestMatch;
-	for (int j = 0; j < tripList.size(); j++) {
-		//if it's within the times of a trip, assign it to that trip
-		//if it after a trip but before the next, assign it to the nxet trip
-		//if it's after the last trip (within an hour), assign it to the last trip
-		//if it's before the first trip (withins an hour), assign it to the first trip
-		//else, assign it to 9
-		if (timeInt >= tripList[j]->startTime && timeInt <= tripList[j]->endTime) {
-			bestMatch = tripList[j]; 
-		} else if (j != (tripList.size() - 1) && timeInt > tripList[j]->endTime &&
-				   timeInt <= tripList[j + 1]->startTime) {
-			cout << "Between trips ";
-			bestMatch = tripList[j + 1];
-			printTrip(tripList[j+1]);
 
-		} else if (j == (tripList.size() - 1) && timeInt > tripList[j]->endTime &&
-				   timeInt < (tripList[j]->endTime + HOUR_INT)) {
-			bestMatch = tripList[j];
-		} else if (j == 0 && timeInt < tripList[j]->startTime &&
-				   timeInt > (tripList[j]->startTime - HOUR_INT)) {
-			bestMatch = tripList[j];
-		} else {
-			//set it to the 9 node
-			bestMatch = blankTrip;
-		}
+ 	//by default, assume the best match is the empty trip
+ 	Trip bestMatch = blankTrip;
 
-	} 	
+ 	//cout << "Time int: " << timeInt << endl;
+ 	//check if the time is within an hour of the first trip - up until the start of the second trip
+ 	if (timeInt < tripList[0]->startTime && timeInt >= (tripList[0]->startTime - HOUR_INT)) {
+ 		//set it to the first trip
+ 		bestMatch = tripList[0];
+ 	}
 
+ 	//check if the time is within the last trip or the hour following it
+ 	else if (timeInt >= tripList.back()->startTime &&
+ 		   	 timeInt <= (tripList.back()->endTime + HOUR_INT)) {
+ 		bestMatch = tripList.back();
+ 	}
+
+ 	//if it's between the first and second trips, assign to the second trip
+ 	else if (timeInt >= tripList[0]->startTime && timeInt < tripList[1]->startTime) {
+ 		bestMatch = tripList[1];
+ 	}
+
+ 	//if it's between the second to last and last trips, assign to the last trip
+ 	else if (timeInt >= tripList[tripList.size() - 2]->endTime &&
+ 			 timeInt < tripList[tripList.size() - 1]->endTime) {
+ 		bestMatch = tripList[tripList.size() - 1];
+ 	}
+
+ 	/* for everything else, go through the intermediate trips and use the trip if the time is 
+ 	after the end time of the previous trip and before the end time of this trip
+ 	*/
+
+ 	for (int j = 1; j < tripList.size() - 1; j++) {
+ 		if (timeInt >= tripList[j - 1]->endTime && timeInt < tripList[j]->endTime) {
+ 			bestMatch = tripList[j];
+ 		}
+ 	}
 
 
 	cout << fareboxString << endl;
-	cout << bestMatch->startTime << "," << bestMatch->endTime << "," << bestMatch->routeID << "," << bestMatch->run << "," << bestMatch->trip << "," << bestMatch->direction << endl;
+	printTrip(bestMatch);
 
 	return bestMatch;
 }
@@ -251,7 +262,7 @@ int main() {
 	//open the file and read each line
 	//add its information to the vector, checking if it's the correct block
 	vector<Trip> tripList; //vector of trips
-	ifstream GTFSfile("trips.csv"); //create file object
+	ifstream GTFSfile("trips.txt"); //create file object
 	string lineFromGTFSfile;
 	if (GTFSfile.is_open()) {
 		//go through by line
@@ -285,5 +296,4 @@ int main() {
 		fareboxFile.close();
 	}
 
-	cout << "1 hour = " << timeToInt("01:00:00") << endl;
 }
