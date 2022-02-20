@@ -188,7 +188,7 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
  		timeString.push_back(fareboxString[i]);
  	}
 
- 	cout << "FB Time StringX" << timeString << endl;
+ 	//cout << "FB Time StringX" << timeString << endl;
 
  	//convert the timestring to an int
  	int timeInt = timeToInt(timeString);
@@ -251,13 +251,72 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
 }
 
 //given a file to output to, create the autohotkey entry for a trip
-void createAHKfromTrip(std::string fileName, Trip tripObj) {
+void createAHKfromTrip(ofstream &outputFile, Trip tripObj) {
+	//ofstream outputFile(fileName);
+
+	//if (outputFile.is_open()) {
+		//enter route code
+		outputFile << "Send " << tripObj->routeID << endl; 
+		outputFile << "Sleep sleepTime" << endl;
+
+		//tab over
+		outputFile << "Send, {tab}" << endl;
+
+		//enter "run"
+		outputFile << "Send " << tripObj->run << endl;
+		outputFile << "Sleep sleepTime" << endl;
+
+		//tab over
+		outputFile << "Send, {tab}" << endl;
+
+		//enter trip
+		outputFile << "Send " << tripObj->trip << endl;
+		outputFile << "Sleep sleepTime" << endl;
+
+		//tab over twice to skip driver
+		outputFile << "Send, {tab}" << endl;
+		outputFile << "Sleep sleepTime" << endl;
+		outputFile << "Send, {tab}" << endl;
+		outputFile << "Sleep sleepTime" << endl;
+
+		//enter o for outbound or i for inbound
+		if (tripObj->direction == 1) {
+			outputFile << "Send i" << endl;
+		} else {
+			outputFile << "Send o" << endl;
+		}
+
+		//tab over twice to get to the next line
+		outputFile << "Send, {tab}" << endl;
+		outputFile << "Sleep sleepTime" << endl;
+		outputFile << "Send, {tab}" << endl;
+		outputFile << "Sleep sleepTime" << endl;
+
+		outputFile << endl;
+
+		//outputFile.close();
+	//}
 
 }
 
 int main() {
+	cout << "Please enter a block: ";
+	std::string block;
+	getline(cin, block);
+
+	//create the file
+	ofstream outputFile("autoclean.ahk");
+
+	//start line of the file with sleep time variable and F10 key
+	if (outputFile.is_open()) {
+		outputFile << "sleepTime := 10" << endl;;
+		outputFile << "F10::" << endl;
+		//outputFile.close();
+	}
+
+
 	//load the correct block from GTFS trips.txt and put in a vector 
-	std::string block = "1553"; //hard coded for now
+	//std::string block = "1553"; //hard coded for now
 
 	//open the file and read each line
 	//add its information to the vector, checking if it's the correct block
@@ -290,10 +349,16 @@ int main() {
 		//go through by line
 		while (getline(fareboxFile, line)) {
 			//for each line, compare the times and generate the correct AHK
-			findTrip(tripList, line);
+			createAHKfromTrip(outputFile, findTrip(tripList, line));
 		}
 		//close the file after the last line
 		fareboxFile.close();
 	}
+
+	//output a return
+	outputFile << "return" << endl;
+
+	//close the output file
+	outputFile.close();
 
 }
