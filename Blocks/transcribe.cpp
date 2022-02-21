@@ -247,6 +247,9 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
 	cout << fareboxString << endl;
 	printTrip(bestMatch);
 
+	//free the blank trip
+	free(blankTrip);
+
 	return bestMatch;
 }
 
