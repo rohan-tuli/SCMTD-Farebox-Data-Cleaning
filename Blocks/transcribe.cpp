@@ -170,10 +170,10 @@ void printTrip(Trip printMe) {
 
 
 //given a farebox export string, search the vector and return trip of the corresponding time
-Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
-	//Trip containing all 9s
-	Trip blankTrip = createTrip("9,9,9,9,9,0,9,9,9,9,00:00:00,9,\"Santa Cruz Metro Center\",0,9,,0,00:00:00");
+Trip findTrip(Trip blankTrip, vector<Trip> tripList, std::string fareboxString) {
+	cout << "findTrip()" << endl;
 
+	cout << "created blank trip" << endl;
 	std::string timeString = "";
 	//get the time string by going through the farebox string until there's a space
 	int i;
@@ -247,8 +247,6 @@ Trip findTrip(vector<Trip> tripList, std::string fareboxString) {
 	cout << fareboxString << endl;
 	printTrip(bestMatch);
 
-	//free the blank trip
-	free(blankTrip);
 
 	return bestMatch;
 }
@@ -318,6 +316,8 @@ int main() {
 	}
 
 
+
+
 	//load the correct block from GTFS trips.txt and put in a vector 
 	//std::string block = "1553"; //hard coded for now
 
@@ -344,15 +344,19 @@ int main() {
 	//print the block
 	printBlock(tripList);
 
+	//Trip containing all 9s
+	Trip blankTrip = createTrip("9,9,9,9,9,0,9,9,9,9,00:00:00,9,,0,9,,0,00:00:00");
 
 	string fileName = "export.csv";
 	ifstream fareboxFile(fileName); //create file object
 	string line; //line read from file
 	if (fareboxFile.is_open()) {
+		cout << "Opening export file" << endl;
 		//go through by line
 		while (getline(fareboxFile, line)) {
+			cout << "Getting line" << endl;
 			//for each line, compare the times and generate the correct AHK
-			createAHKfromTrip(outputFile, findTrip(tripList, line));
+			createAHKfromTrip(outputFile, findTrip(blankTrip, tripList, line));
 		}
 		//close the file after the last line
 		fareboxFile.close();
