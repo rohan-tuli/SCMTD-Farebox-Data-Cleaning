@@ -211,7 +211,7 @@ Trip findTrip(Trip blankTrip, vector<Trip> tripList, std::string fareboxString) 
 
  	//cout << "Time int: " << timeInt << endl;
  	//check if the time is within an hour of the first trip - up until the start of the second trip
- 	if (timeInt < tripList[0]->startTime && timeInt >= (tripList[0]->startTime - HOUR_INT)) {
+ 	if (timeInt < tripList[0]->endTime && timeInt >= (tripList[0]->startTime - HOUR_INT)) {
  		//set it to the first trip
  		bestMatch = tripList[0];
  	}
@@ -310,7 +310,7 @@ int main() {
 
 	//start line of the file with sleep time variable and F10 key
 	if (outputFile.is_open()) {
-		outputFile << "sleepTime := 10" << endl;;
+		outputFile << "sleepTime := 5" << endl;;
 		outputFile << "F10::" << endl;
 		//outputFile.close();
 	}
