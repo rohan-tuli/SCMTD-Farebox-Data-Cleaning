@@ -1,5 +1,5 @@
 sleepTime := 70
-F13::
+F8::
 
 Send, {F6}
 Sleep sleepTime
