@@ -1,4 +1,4 @@
-sleepTime := 70
+sleepTime := 140
 F8::
 
 Send, {F6}
